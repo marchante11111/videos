@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html><head><style>html,body{margin:0;background:#000}canvas{display:block}</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script>
+const c=document.getElementById('c'),x=c.getContext('2d');
+const W=1080,H=1920;
+// background
+let g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#1a1838');g.addColorStop(1,'#0b0a1c');
+x.fillStyle=g;x.fillRect(0,0,W,H);
+// shelves faint
+const cols=['#e94b6a','#f2c14e','#3fb67b','#4a7be0','#a15ad8','#e98a3c','#3cc6c6'];
+for(let r=0;r<4;r++){const y=430+r*150;x.fillStyle='#2a2850';x.fillRect(0,y+90,W,12);
+ for(let i=0;i<30;i++){x.globalAlpha=.35;x.fillStyle=cols[(i*7+r*3)%7];const h=50+((i*13+r*5)%40);x.fillRect(i*37+4,y+90-h,28,h);}x.globalAlpha=1;}
+// door frame
+const dx=170,dy=360,dw=740,dh=980;
+x.fillStyle='#3a3f63';x.fillRect(dx-24,dy-24,dw+48,dh+48);
+let dg=x.createLinearGradient(0,dy,0,dy+dh);dg.addColorStop(0,'#0e1530');dg.addColorStop(1,'#060912');
+x.fillStyle=dg;x.fillRect(dx,dy,dw,dh);
+// moon glow
+let mg=x.createRadialGradient(dx+dw*0.5,dy+170,10,dx+dw*0.5,dy+170,380);mg.addColorStop(0,'rgba(140,160,220,.45)');mg.addColorStop(1,'rgba(140,160,220,0)');
+x.fillStyle=mg;x.fillRect(dx,dy,dw,dh);
+// delivery guy outside (red)
+function deliv(cx,cy,s){x.save();x.translate(cx,cy);x.scale(s,s);
+ x.fillStyle='#d8383f';x.beginPath();x.roundRect(-70,40,140,260,40);x.fill();
+ // box
+ x.fillStyle='#e63a44';x.fillRect(-190,30,150,120);x.fillStyle='#fff';x.font='bold 22px Arial';x.textAlign='center';x.fillText('DELIVERY',-115,98);
+ // head
+ x.fillStyle='#f4f4f6';x.beginPath();x.arc(0,-30,95,0,7);x.fill();
+ x.fillStyle='#d8383f';x.beginPath();x.arc(0,-40,98,Math.PI,0);x.fill();x.fillRect(-98,-44,196,18);
+ // eyes - glowing red (infected hint)
+ x.fillStyle='#ff2d3d';x.shadowColor='#ff2d3d';x.shadowBlur=30;
+ x.beginPath();x.arc(-34,-4,13,0,7);x.arc(34,-4,13,0,7);x.fill();x.shadowBlur=0;
+ x.strokeStyle='#222';x.lineWidth=6;x.beginPath();x.moveTo(-25,45);x.lineTo(25,45);x.stroke();
+ // knocking arm
+ x.fillStyle='#d8383f';x.save();x.translate(60,90);x.rotate(-0.6);x.fillRect(0,-20,150,40);x.restore();
+ x.fillStyle='#f4f4f6';x.beginPath();x.arc(185,-15,28,0,7);x.fill();
+ x.restore();}
+deliv(dx+dw*0.52,dy+430,1.25);
+// glass reflections and divider
+x.fillStyle='rgba(255,255,255,.07)';x.beginPath();x.moveTo(dx+40,dy);x.lineTo(dx+150,dy);x.lineTo(dx+40,dy+260);x.fill();
+
+// knock marks
+x.fillStyle='#ff2d3d';x.font='900 90px Arial Black, Arial';x.textAlign='center';
+x.save();x.translate(dx+dw-150,dy+200);x.rotate(.2);x.fillText('KNOCK',0,0);x.restore();
+// vignette
+let vg=x.createRadialGradient(W/2,H*0.45,300,W/2,H*0.5,1200);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.7)');x.fillStyle=vg;x.fillRect(0,0,W,H);
+// scared stocker foreground
+function stocker(cx,cy,s){x.save();x.translate(cx,cy);x.scale(s,s);
+ x.fillStyle='#2bb36a';x.beginPath();x.roundRect(-85,120,170,300,50);x.fill();
+ x.fillStyle='#f6f6f8';x.beginPath();x.arc(0,0,150,0,7);x.fill();
+ x.fillStyle='#2bb36a';x.beginPath();x.arc(0,-25,152,Math.PI*1.03,Math.PI*1.97);x.fill();
+ x.beginPath();x.ellipse(110,-55,90,24,0.05,0,7);x.fill();
+ x.fillStyle='#fff';x.globalAlpha=.6;x.beginPath();x.roundRect(-30,-120,60,30,10);x.fill();x.globalAlpha=1;
+ // eyes wide
+ x.fillStyle='#fff';x.strokeStyle='#1a1a2a';x.lineWidth=6;
+ for(const ex of[-55,55]){x.beginPath();x.arc(ex,20,36,0,7);x.fill();x.stroke();x.fillStyle='#1a1a2a';x.beginPath();x.arc(ex+10,10,14,0,7);x.fill();x.fillStyle='#fff';}
+ // mouth open
+ x.fillStyle='#1a1a2a';x.beginPath();x.ellipse(0,95,30,40,0,0,7);x.fill();
+ // sweat
+ x.fillStyle='#6fc3ff';x.beginPath();x.moveTo(130,-10);x.quadraticCurveTo(155,40,130,50);x.quadraticCurveTo(105,40,130,-10);x.fill();
+ x.restore();}
+stocker(260,1450,1.25);
+// text
+function big(t,cx,cy,size,fill){x.font=`900 ${size}px "Arial Black", Arial`;x.textAlign='center';x.lineJoin='round';
+ x.lineWidth=size*0.22;x.strokeStyle='#000';x.strokeText(t,cx,cy);x.fillStyle=fill;x.fillText(t,cx,cy);}
+big('DON\'T OPEN',W/2,230,138,'#ffffff');
+big('THE DOOR',W/2,1780,170,'#ffd23f');
+</script></body></html>
