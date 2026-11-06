@@ -22,7 +22,14 @@ window.P1=async(i)=>{const it=ITEMS[i];const log=[];
  const ti=document.querySelector('ytcp-uploads-review #time-of-day-container input, ytcp-time-of-day-picker input');if(ti){ti.focus();ti.value=it[6];ti.dispatchEvent(new Event('input',{bubbles:true}));ti.dispatchEvent(new Event('change',{bubbles:true}));ti.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',code:'Enter',keyCode:13,bubbles:true}));log.push('time '+ti.value)}else log.push('NO TIME');
  await sleep(800);
  document.querySelector('ytcp-uploads-review #datepicker-trigger, ytcp-uploads-review ytcp-text-dropdown-trigger#datepicker-trigger').click();await sleep(1500);
- const di=[...document.querySelectorAll('ytcp-date-picker input, tp-yt-paper-dialog input')].find(e=>e.offsetParent);if(di){di.focus();di.select();document.execCommand('insertText',false,it[5]);log.push('date typed '+di.value)}else log.push('NO DATE INPUT');
+ const di=[...document.querySelectorAll('ytcp-date-picker input, tp-yt-paper-dialog input')].find(e=>e.offsetParent&&e.value.includes('/'));
+ let root=di;for(let k=0;k<12&&root;k++){root=root.parentElement;if(root&&/D\s*S\s*T/.test(root.innerText||''))break;}
+ const day=String(+it[5].slice(0,2));const mon=(+it[5].slice(3,5))+'/'+it[5].slice(6);
+ const leaves=[...(root||document).querySelectorAll('*')].filter(e=>e.children.length==0&&e.offsetParent);
+ const hdr=leaves.find(e=>e.innerText.trim()==mon.padStart(7,'0'));const hdrs=leaves.filter(e=>/^\d\d\/\d{4}$/.test(e.innerText.trim()));
+ const nxt=hdr?hdrs.find(h=>h.getBoundingClientRect().top>hdr.getBoundingClientRect().top+5):null;
+ const cell=leaves.find(e=>e.innerText.trim()==day&&hdr&&e.getBoundingClientRect().top>hdr.getBoundingClientRect().top&&(!nxt||e.getBoundingClientRect().top<nxt.getBoundingClientRect().top));
+ if(cell){cell.click();await sleep(1000);log.push('date '+(document.querySelector('ytcp-uploads-review #datepicker-trigger')||{}).innerText)}else log.push('NO CELL hdr='+!!hdr);
  return log.join(' | ')};
 window.DONE=async()=>{document.querySelector('#done-button').click();await sleep(4000);return [...document.querySelectorAll('tp-yt-paper-dialog,ytcp-dialog,ytcp-uploads-still-processing-dialog')].filter(d=>d.offsetParent).map(d=>d.innerText.slice(0,160).replace(/\s+/g,' ')).join(' || ')};
 window.STATE=()=>{const r=document.querySelector('ytcp-uploads-review');const dt=document.querySelector('ytcp-uploads-review #datepicker-trigger');const tm=document.querySelector('ytcp-uploads-review ytcp-time-of-day-picker input');return (dt&&dt.innerText.trim())+' '+(tm&&tm.value)+' | progress: '+((document.querySelector('ytcp-video-upload-progress')||{}).innerText||'').replace(/\s+/g,' ').slice(0,80)};
