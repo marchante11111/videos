@@ -46,3 +46,4 @@ window.RESCHED=async(date,time)=>{const b=document.querySelector('ytcp-video-met
  await sleep(500);const shown=(pop.querySelector('#datepicker-trigger, ytcp-text-dropdown-trigger')||{}).innerText;const tv=ti.value;
  const done=[...document.querySelectorAll('ytcp-button, button')].filter(b=>b.offsetParent&&/^Concluído$/.test(b.innerText.trim()));done[done.length-1].click();await sleep(1200);
  const save=[...document.querySelectorAll('ytcp-button#save, #save')].find(b=>b.offsetParent);save.click();await sleep(3500);return 'set '+String(shown).trim()+' '+tv+' saved='+save.hasAttribute('disabled')};
+window.GOURL=async(path)=>{const it=await (await fetch(RAW+path+'?x='+Date.now())).json();ITEMS.push(it);window.RES='running';RUN2(ITEMS.length-1).then(async x=>{if(/NOT CONFIRMED/.test(x))x+=' RETRY '+await FIN();RES=x}).catch(e=>RES='ERR '+e.message);return 'started '+it[2]};
