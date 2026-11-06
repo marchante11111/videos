@@ -1,0 +1,7 @@
+window.PRIV=async()=>{const sl=ms=>new Promise(r=>setTimeout(r,ms));for(let k=0;k<20&&!document.querySelector('#title-textarea');k++)await sl(500);await sl(1500);
+const v=[...document.querySelectorAll('*')].filter(e=>e.children.length<3&&/^Visibilidade$/.test((e.innerText||'').trim())&&e.offsetParent);const box=v[0].closest('ytcp-dropdown-trigger, ytcp-video-visibility-select, [role=button], ytcp-text-dropdown-trigger')||v[0].parentElement.parentElement;box.click();await sl(1500);
+const hdr=[...document.querySelectorAll('*')].filter(e=>e.children.length<2&&/^Guardar ou publicar$/.test((e.innerText||'').trim())&&e.offsetParent).pop();hdr.click();await sl(1000);
+const pr=[...document.querySelectorAll('tp-yt-paper-radio-button')].find(r=>r.offsetParent&&/^Privado/.test(r.innerText.trim()));if(!pr)return 'no privado';pr.click();await sl(500);
+const done=[...document.querySelectorAll('ytcp-button, button')].filter(b=>b.offsetParent&&/^Concluído$/.test(b.innerText.trim()));done[done.length-1].click();await sl(1000);
+const save=[...document.querySelectorAll('ytcp-button#save, #save')].find(b=>b.offsetParent);save.click();await sl(3000);
+const vis=[...document.querySelectorAll('*')].filter(e=>e.children.length<3&&/^Visibilidade$/.test((e.innerText||'').trim())&&e.offsetParent)[0];return (vis.parentElement.parentElement.innerText||'').replace(/\s+/g,' ').slice(0,40)+' | saved-disabled='+save.hasAttribute('disabled')};
