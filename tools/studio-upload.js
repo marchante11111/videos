@@ -39,3 +39,10 @@ window.FIN=async()=>{const st=STATE();document.querySelector('#done-button').cli
 window.RUN=async(i)=>{let r;try{r=await P1(i)}catch(e){return 'P1 ERR '+e.message}if(!/date \d\d\/11\/2026/.test(r))return 'STOP before done: '+r;return r+' || '+(await FIN())};
 window.RUN2=async(i)=>{let r;try{r=await P1(i)}catch(e){return 'P1 ERR '+e.message}let last=r;for(let k=0;k<4&&/NO CELL/.test(last);k++){await sleep(2000);last=await PICK(ITEMS[i][5]);r+=' / '+last}const st=STATE();if(!st.startsWith(ITEMS[i][5]))return 'STOP: '+r+' | '+st;return r+' || '+(await FIN())};
 window.GO=(i)=>{window.RES='running';RUN2(i).then(x=>window.RES=x).catch(e=>window.RES='ERR '+e.message);return 'started '+i};
+window.RESCHED=async(date,time)=>{const b=document.querySelector('ytcp-video-metadata-visibility #select-button, ytcp-video-metadata-visibility ytcp-dropdown-trigger');b.click();await sleep(1500);
+ const pop=[...document.querySelectorAll('tp-yt-paper-dialog, ytcp-video-visibility-select, #visibility-popup')].find(e=>e.offsetParent&&/Agendar como público/.test(e.innerText));if(!pop)return 'no popup';
+ const ti=[...pop.querySelectorAll('input')].find(i=>/^\d{1,2}:\d\d$/.test(i.value));ti.focus();ti.value=time;ti.dispatchEvent(new Event('input',{bubbles:true}));ti.dispatchEvent(new Event('change',{bubbles:true}));ti.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',code:'Enter',keyCode:13,bubbles:true}));await sleep(600);
+ const trg=pop.querySelector('#datepicker-trigger, ytcp-text-dropdown-trigger');trg.click();await sleep(1500);let r=await PICK(date);for(let k=0;k<3&&/NO CELL/.test(r);k++){await sleep(1500);r=await PICK(date);}
+ await sleep(500);const shown=(pop.querySelector('#datepicker-trigger, ytcp-text-dropdown-trigger')||{}).innerText;const tv=ti.value;
+ const done=[...document.querySelectorAll('ytcp-button, button')].filter(b=>b.offsetParent&&/^Concluído$/.test(b.innerText.trim()));done[done.length-1].click();await sleep(1200);
+ const save=[...document.querySelectorAll('ytcp-button#save, #save')].find(b=>b.offsetParent);save.click();await sleep(3500);return 'set '+String(shown).trim()+' '+tv+' saved='+save.hasAttribute('disabled')};
